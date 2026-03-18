@@ -52,23 +52,23 @@ The system was developed as a Final Year Project and demonstrates:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        Frontend (React)                      │
-│  Dashboard │ Upload │ Analytics │ Simulation │ Feedback      │
+│                        Frontend (React)                     │
+│  Dashboard │ Upload │ Analytics │ Simulation │ Feedback     │
 └─────────────────────┬───────────────────────────────────────┘
                       │ HTTP / MJPEG stream
 ┌─────────────────────▼───────────────────────────────────────┐
-│                    Flask API (Python)                        │
+│                    Flask API (Python)                       │
 │  /api/live-stats  /api/stream-local  /api/emergency         │
 │  /api/comparison  /api/performance   /api/start-analysis    │
 └────────┬───────────────────────┬────────────────────────────┘
          │                       │
 ┌────────▼────────┐   ┌──────────▼──────────┐
-│  AI Pipeline    │   │   Supabase (DB)      │
-│  YOLOv8n        │   │   lane_status        │
-│  DeepSORT       │   │   emergency_log      │
-│  RF Model       │   │   comparison_results │
-│  congestion.pkl │   │   video              │
-└─────────────────┘   │   feedback           │
+│  AI Pipeline    │   │   Supabase (DB)     │
+│  YOLOv8n        │   │   lane_status       │
+│  DeepSORT       │   │   emergency_log     │
+│  RF Model       │   │   comparison_results│
+│  congestion.pkl │   │   video             │
+└─────────────────┘   │   feedback          │
                       └─────────────────────┘
 ```
 
