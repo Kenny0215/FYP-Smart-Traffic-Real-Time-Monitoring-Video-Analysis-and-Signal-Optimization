@@ -1,4 +1,4 @@
-# 🚦 SmartTraffic AI: Traffic Video Analytics and Signal Optimization
+# 🚦 SmartTraffic AI: Real-Time Monitoring Traffic And Signal Optimization
 
 
 ## 📋 Table of Contents
