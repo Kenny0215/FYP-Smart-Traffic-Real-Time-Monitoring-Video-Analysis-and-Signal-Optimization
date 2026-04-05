@@ -270,6 +270,7 @@ Frontend runs on `http://localhost:5173`
 ## License
 
 This project is developed for academic purposes as a University Technical Malaysia Melacca (UTeM) Final Year Project (FYP).
+
 Author : KENNY KHOW JIUN XIAN | Faculty Of Artificial Intelligence And Cybersecurity (FAIX)
----
+
 
