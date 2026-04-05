@@ -261,8 +261,8 @@ Frontend runs on `http://localhost:5173`
 
 | Limitation | Notes |
 |---|---|
-| No dedicated ambulance YOLO class | YOLOv8n (COCO) detects no ambulance class — emergency detection uses a large Bus-class size heuristic (> 25% of frame) |
-| Speed calibration | `PIXELS_PER_METER = 8.0` is fixed — accuracy varies with camera angle and height |
+| No dedicated ambulance YOLO class | YOLOv8n (COCO) detects no ambulance class as emergency detection uses a large Bus-class size heuristic (> 25% of frame) |
+| Speed calibration | `PIXELS_PER_METER = 8.0` is fixed as accuracy varies with camera angle and height |
 | Single intersection | System is designed for a 4-lane single intersection; multi-intersection support would require architectural changes |
 
 ---
@@ -271,6 +271,6 @@ Frontend runs on `http://localhost:5173`
 
 This project is developed as a prototype product for academic purposes of Final Year Project.
 
-Author : KENNY KHOW JIUN XIAN | Faculty Of Artificial Intelligence And Cybersecurity (FAIX) | University Technical Malaysia Melacca (UTeM)
+Author : KENNY KHOW JIUN XIAN | Faculty of Artificial Intelligence and Cybersecurity (FAIX) | University Technical Malaysia Melacca (UTeM)
 
 
