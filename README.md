@@ -271,6 +271,6 @@ Frontend runs on `http://localhost:5173`
 
 This project is developed as a prototype product for academic purposes of Final Year Project.
 
-Author : KENNY KHOW JIUN XIAN | Faculty of Artificial Intelligence and Cybersecurity (FAIX) | University Technical Malaysia Melacca (UTeM)
+Author : Kenny Khow Jiun Xian | Faculty of Artificial Intelligence and Cybersecurity (FAIX) | University Technical Malaysia Melacca (UTeM)
 
 
