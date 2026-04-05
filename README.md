@@ -38,42 +38,6 @@ The system was developed as a Final Year Project and demonstrates:
 
 ---
 
-### Backend (`app.py`)
-| Change | Details |
-|---|---|
-| **Fuzzy Logic Controller** | Replaced hard `if/else` green time formula with `scikit-fuzzy` controller. Inputs: vehicle count, avg speed, heavy ratio. Output: smooth 10–60s green time. Thread-safe with `_fuzzy_lock`. |
-| **Inter-lane Coordination** | `coordinate_green_times()` distributes a shared 120s cycle across all 4 lanes proportionally by priority score (0–100). High-congestion lanes take time from low-congestion lanes. |
-| **Continuous Priority Score** | `calculate_priority_score()` replaces Low/Medium/High label for coordination. Weighted formula: vehicle count × 2.5 + density × 15 + heavy ratio × 20 + speed factor × 15 + congestion tier × 25. |
-| **Vehicle Type Classification Fix** | `vehicle_types` (Car/Motorcycle/Bus/Truck) now sourced from **DeepSort confirmed tracks** — not raw YOLO boxes. Ensures `Car + Motorcycle + Bus + Truck == vehicle_count` always. |
-| **New Fields in `lane_stats`** | `coordinated_green`, `priority_score`, `vehicle_types`, `dominant_vehicle_type` added to shared state and Supabase auto-save. |
-| **New Endpoints** | `/api/coordination` — full cycle breakdown per lane. `/api/vehicle-type-summary` — aggregated type counts across all lanes. `/api/model-metrics` — RF model accuracy, F1, confusion matrix, feature importances. `/api/snapshot/<lane_key>` — single JPEG frame capture. |
-
-### Frontend — Dashboard (`DashboardHome.tsx`)
-| Change | Details |
-|---|---|
-| **Vehicle Category Breakdown** | New card showing live Car/Motorcycle/Bus/Truck counts with percentage bars and per-lane breakdown table. |
-| **Lane Cards — Monitoring Only** | Removed Fuzzy/Coordinated/Priority Score bars from lane cards. Dashboard is now pure real-time monitoring — signal details belong to Simulation page. |
-| **Vehicle Type Badges** | Each lane card shows inline type mini-badges for detected vehicle categories. |
-
-### Frontend — Simulation (`SimulationPage.tsx`)
-| Change | Details |
-|---|---|
-| **Score-based Round-robin** | `sortByScore()` replaces `RF_W` label sort. Lanes ordered by continuous `priority_score` — finer granularity than Low/Medium/High. |
-| **Coordinated Green Timing** | Simulation uses `coordinated_green` (inter-lane allocated time) as signal duration, not just fuzzy `green_time`. |
-| **Type-accurate Vehicle Spawning** | Canvas vehicles now spawn to **exactly match `vehicle_count`** from backend detection, split by `vehicle_types` ratio. Car (teal), Motorcycle (amber/small), Bus (blue/large), Truck (orange/large). Excess vehicles removed when count drops. |
-| **Multi-lane Emergency Scenarios** | Full emergency system with 4 vehicle types × multiple scenarios per type. |
-| **Severity Ranking Engine** | `SEVERITY_RANK × 10 + VEHICLE_TYPE_RANK` — Ambulance Critical (44) beats Police Critical (42). Highest-rank emergency wins the signal each cycle. |
-| **Queue-based Panel** | Users build a staged list of entries (different lane + vehicle type + scenario each), then confirm all at once. Fixed modal overlay — no scroll clipping. |
-| **Active Emergency Banner** | Shows all active emergencies sorted by rank with `▲ HIGHEST PRIORITY` indicator. Individual and "Clear All" controls. |
-
-### Frontend — Analytics (`AnalyticsPage.tsx`)
-| Change | Details |
-|---|---|
-| **On-demand Generation** | Analytics no longer auto-loads on page open. User must click **Generate Report** first. Three states: `idle → loading → ready`. |
-| **Regenerate Button** | When data is loaded, a Regenerate button allows re-fetching after a new analysis run. |
-
----
-
 ## Features
 
 | Feature | Description |
@@ -104,14 +68,14 @@ The system was developed as a Final Year Project and demonstrates:
 └─────────────────────────┬───────────────────────────────────────────┘
                           │ HTTP / MJPEG stream / poll every 3s
 ┌─────────────────────────▼───────────────────────────────────────────┐
-│                    Flask API v4.5 (Python)                          │
+│                         Flask API (Python)                          │
 │                                                                     │
 │  /api/live-stats        /api/coordination    /api/stream-local      │
 │  /api/vehicle-type-summary  /api/emergency   /api/model-metrics     │
 │  /api/comparison        /api/performance     /api/snapshot          │
 │  /api/upload-video      /api/start-analysis  /api/stop-analysis     │
 │                                                                     │
-│  Rate Limiter (per-IP) │ CORS │ Auto-save thread (5s)              │
+│  Rate Limiter (per-IP) │ CORS │ Auto-save thread (5s)               │
 └────────┬────────────────────────────┬───────────────────────────────┘
          │                            │
 ┌────────▼────────────────┐  ┌────────▼──────────────────┐
@@ -170,7 +134,7 @@ The system was developed as a Final Year Project and demonstrates:
 ```
 smarttraffic/
 ├── backend/
-│   ├── app.py                          # Flask API v4.5 — main entry point
+│   ├── app.py                          # Flask API - main entry point
 │   ├── .env.local                      # Supabase credentials (not committed)
 │   ├── uploads/                        # Uploaded video files
 │   └── model/
@@ -219,71 +183,7 @@ smarttraffic/
 - Python **3.10+**
 - Node.js **18+**
 - Traffic videos — MP4/AVI/MOV/MKV files for each lane placed in `backend/model/`
-- Supabase project with the required tables created
-
-### Supabase Tables Required
-
-```sql
--- lane_status
-create table lane_status (
-  id                   bigserial primary key,
-  lane_name            text,
-  frame                integer,
-  vehicle_count        integer,
-  density              float,
-  heavy_ratio          float,
-  avg_speed            float,
-  congestion           text,
-  ai_green_time        float,
-  coordinated_green    float,
-  priority_score       float,
-  priority_level       text,
-  car_count            integer,
-  motorcycle_count     integer,
-  bus_count            integer,
-  truck_count          integer,
-  dominant_vehicle_type text,
-  timestamp            timestamptz
-);
-
--- emergency_log
-create table emergency_log (
-  id           bigserial primary key,
-  vehicle_type text,
-  lane         text,
-  action       text,
-  frame        integer,
-  timestamp    timestamptz
-);
-
--- comparison_results
-create table comparison_results (
-  id                     bigserial primary key,
-  lane                   text,
-  avg_vehicles           float,
-  traditional_green      float,
-  ai_green               float,
-  ideal_green            float,
-  traditional_efficiency float,
-  ai_efficiency          float,
-  improvement            float,
-  traditional_wait       float,
-  ai_wait                float,
-  timestamp              timestamptz
-);
-
--- video
-create table video (
-  id          bigserial primary key,
-  lane_name   text,
-  file_name   text,
-  file_size   float,
-  format      text,
-  upload_date timestamptz
-);
-```
-
----
+- Supabase project with the required credential keys needed
 
 ## Installation
 
@@ -347,13 +247,6 @@ python app.py
 
 Flask runs on `http://127.0.0.1:5000`
 
-On startup it:
-- Loads YOLOv8n model
-- Loads `congestion_model.pkl` (Random Forest)
-- Builds the fuzzy logic controller (scikit-fuzzy)
-- Starts 4 lane processing threads (daemon)
-- Starts auto-save thread (writes to Supabase every 5s)
-
 ### 2. Start the React frontend
 
 ```bash
@@ -365,144 +258,7 @@ Frontend runs on `http://localhost:5173`
 
 > ⚠️ Start Flask **before** the frontend. Both must run simultaneously.
 
----
-
-## API Endpoints
-
-### Live Data
-
-| Method | Endpoint | Rate Limit | Description |
-|---|---|---|---|
-| `GET` | `/api/health` | 30/min | Health check — YOLO + RF model + stream status |
-| `GET` | `/api/live-stats` | 60/min | Live stats for all 4 lanes including `vehicle_types`, `coordinated_green`, `priority_score` |
-| `GET` | `/api/live-stats/<lane_key>` | 60/min | Live stats for one specific lane |
-| `GET` | `/api/coordination` | 30/min | Full 120s cycle breakdown — fuzzy green, coordinated green, priority score per lane |
-| `GET` | `/api/vehicle-type-summary` | 60/min | Aggregated Car/Motorcycle/Bus/Truck totals across all lanes |
-
-### Streaming
-
-| Method | Endpoint | Rate Limit | Description |
-|---|---|---|---|
-| `GET` | `/api/stream-local/<lane_key>` | 10/min | MJPEG video stream (multipart/x-mixed-replace) |
-| `GET` | `/api/snapshot/<lane_key>` | 20/min | Single JPEG frame for a lane |
-
-### Results & Analysis
-
-| Method | Endpoint | Rate Limit | Description |
-|---|---|---|---|
-| `GET` | `/api/comparison` | 10/min | AI vs Traditional comparison (CSV → JSON) |
-| `GET` | `/api/performance` | 10/min | 5-row summary metrics from `performance_metrics.csv` |
-| `GET` | `/api/model-metrics` | — | RF model accuracy, F1, confusion matrix, feature importances |
-| `GET` | `/api/chart` | 10/min | Pre-generated bar chart as base64 PNG |
-
-### Emergency
-
-| Method | Endpoint | Rate Limit | Description |
-|---|---|---|---|
-| `GET` | `/api/emergency` | 30/min | Live session emergency detections (current run only) |
-| `GET` | `/api/emergency-history` | 10/min | Full historical emergency log from Supabase |
-
-### Control
-
-| Method | Endpoint | Rate Limit | Description |
-|---|---|---|---|
-| `POST` | `/api/upload-video` | 10/min | Upload video file for a lane |
-| `POST` | `/api/start-analysis` | 5/min | Start YOLO processing threads |
-| `POST` | `/api/stop-analysis` | 5/min | Stop analysis and reset all state |
-| `POST` | `/api/save-lanes-csv` | 5/min | Save `training_data.csv` to Supabase `lane_status` |
-| `POST` | `/api/save-comparison` | 5/min | Save `comparison_table.csv` to Supabase `comparison_results` |
-| `POST` | `/api/save-emergency` | 5/min | Save `emergency_log.csv` to Supabase `emergency_log` |
-
----
-
-## AI Modules
-
-### Module 1 — Vehicle Detection (YOLOv8n)
-Detects 4 vehicle classes from COCO: `Car (2)`, `Motorcycle (3)`, `Bus (5)`, `Truck (7)`. Runs every 2 frames (`PROCESS_EVERY_N = 2`) with a shared `yolo_lock` for thread safety across 4 concurrent lanes. Confidence threshold: 0.4.
-
-### Module 2 — Vehicle Tracking (DeepSORT)
-Tracks each detected vehicle across frames using `n_init=1` (immediate confirmation), `max_age=30`, `max_iou_distance=0.7`. A `last_boxes` cache redraws cached bounding boxes on non-detection frames to prevent flicker.
-
-### Module 3 — Vehicle Classification
-Vehicle type counts (Car/Motorcycle/Bus/Truck) are derived from **confirmed DeepSort tracks only** — not raw YOLO boxes. This ensures the sum of all type counts always equals `vehicle_count`. `track_type_counts` replaces the old `frame_type_counts`.
-
-### Module 4 — Speed Estimation
-Calculates speed in km/h from pixel displacement between confirmed track positions using `PIXELS_PER_METER = 8.0` calibration. Speed is sampled every `SPEED_SAMPLE_FRAMES = 5` frames for stability.
-
-### Module 5 — Congestion Classification
-Rule-based classification per lane:
-- `High`: ≥ 15 vehicles (`CONG_HIGH`)
-- `Medium`: ≥ 8 vehicles (`CONG_MEDIUM`)
-- `Low`: < 8 vehicles
-
-### Module 6 — Priority Prediction (Random Forest)
-`congestion_model.pkl` takes `[vehicle_count, density, heavy_ratio, avg_speed, congestion_enc]` and predicts Low/Medium/High priority. A three-layer hybrid system:
-1. Rule-based override — High congestion always → High priority (RF bypassed)
-2. RF model with floor — Medium congestion → RF result floored at Medium
-3. Pure RF — Low congestion → RF decides freely
-
-### Module 7 — Fuzzy Logic Signal Timing *(new in v4.5)*
-`scikit-fuzzy` controller replaces the hard `if/else` green time formula. Three inputs with triangular membership functions:
-- `vehicle_count`: low (0–8), medium (5–17), high (13–30)
-- `avg_speed`: slow (0–30), medium (20–70), fast (60–100)
-- `heavy_ratio`: low (0–0.4), high (0.3–1.0)
-
-Six fuzzy rules produce a continuous green time output (10–60s). A rule-based fallback (`_rule_based_green_time`) is used if fuzzy inference fails. Thread-safe via `_fuzzy_lock`.
-
-### Module 8 — Inter-lane Coordination *(new in v4.5)*
-`coordinate_green_times()` distributes a fixed `CYCLE_TIME = 120s` across all 4 lanes proportionally by `priority_score`. Each lane's `coordinated_green` = `(score / total_score) × 120`, clamped to `[MIN_GREEN, MAX_GREEN]`. This means high-congestion lanes take allocated time directly from low-congestion lanes.
-
-Priority score formula: `vehicle_count × 2.5 + density × 15 + heavy_ratio × 20 + speed_factor × 15 + congestion_weight × 25`, capped at 100.
-
-### Module 9 — Emergency Detection
-Large Bus-class bounding boxes (width or height > 25% of frame) are flagged as potential ambulances using a size heuristic. Immediately overrides priority to `High` and extends green to `MAX_GREEN (60s)`. Only logged once per track ID per session.
-
----
-
-## Pages Overview
-
-### 🏠 Dashboard (`DashboardHome.tsx`)
-Real-time monitoring only. Shows:
-- Total vehicles, avg time saved, high congestion count, active signal
-- **Vehicle Category Breakdown** card — live Car/Motorcycle/Bus/Truck counts with % bars and per-lane table
-- Lane status cards — congestion badge, vehicle count, speed, AI green vs Traditional, vehicle type mini-badges
-- Emergency alerts panel — live session detections with 30s window indicator
-
-### 📹 Video Upload (`UploadPage.tsx`)
-- Upload MP4/AVI/MOV/MKV per lane, start/stop analysis
-- Live MJPEG stream view per lane
-- `hasData` prop propagated to Dashboard and Simulation
-
-### 📊 Analytics (`AnalyticsPage.tsx`)
-- **On-demand only** — data loads when user clicks **Generate Report**
-- 4 bar charts: Green Time, Signal Efficiency, Wait Time, Congestion Distribution
-- Sortable comparison table with averages row
-- Export to PDF (print-to-PDF via browser)
-- Regenerate button to re-fetch after new analysis
-
-### 🎮 Simulation (`SimulationPage.tsx`)
-Canvas intersection with:
-- **Type-accurate vehicle spawning** — exact `vehicle_count` from backend, split by `vehicle_types` ratio. Car (teal), Motorcycle (amber/small), Bus (blue/large with BUS label), Truck (orange with TRK label)
-- **Coordinated signal timing** — uses `coordinated_green` (inter-lane) as actual signal duration
-- **Score-based round-robin** — continuous priority score ordering (not just Low/Medium/High)
-- **Emergency scenario system** — queue-based modal (Step 1: Vehicle Type, Step 2: Scenario, Step 3: Lane). 4 vehicle types, 25 scenarios. Staged entries, confirm all at once.
-- **Severity ranking engine**: `SEVERITY_RANK × 10 + VEHICLE_TYPE_RANK` — Ambulance Critical (44) > Police Critical (42) > Ambulance High (34)
-- Speed control: 1×, 2×, 4×
-- Decision log showing score-based ordering and emergency overrides
-
-#### Emergency Vehicle Types & Scenarios
-
-| Vehicle | Scenarios |
-|---|---|
-| 🚑 Ambulance | Cardiac Arrest, Near Death, Stroke/Brain, Broken Bone, Leg Broken, Head Injury, Chest Pain, Minor Injury |
-| 🚒 Fire Truck | Building Fire, Gas Explosion, Vehicle Fire, Forest Fire, Small Fire, Rescue Operation |
-| 🚓 Police | Active Chase, Armed Robbery, Hostage Situation, Accident Response, Crowd Control, Routine Patrol |
-| 🚐 VIP Convoy | Head of State, State Minister, Diplomatic Visit, Medical Transfer, Celebrity/Event |
-
-### 📈 Analytics — Signal Comparison
-Compares AI adaptive system against traditional fixed 60s timing across all 4 lanes. Metrics: green time, wait time, efficiency %, improvement %. Data sourced from `comparison_table.csv` with Supabase fallback.
-
----
+## Screenshots
 
 ## Known Limitations
 
@@ -510,7 +266,6 @@ Compares AI adaptive system against traditional fixed 60s timing across all 4 la
 |---|---|
 | No dedicated ambulance YOLO class | YOLOv8n (COCO) detects no ambulance class — emergency detection uses a large Bus-class size heuristic (> 25% of frame) |
 | Speed calibration | `PIXELS_PER_METER = 8.0` is fixed — accuracy varies with camera angle and height |
-| Simulation vs real signal | Canvas simulation runs its own signal cycle engine — it does not directly control real-world signals |
 | Single intersection | System is designed for a 4-lane single intersection; multi-intersection support would require architectural changes |
 
 ---
@@ -521,4 +276,3 @@ This project is developed for academic purposes as a Final Year Project (FYP).
 
 ---
 
-*SmartTraffic AI — FYP v4.5 | Built with Flask · React · YOLOv8 · scikit-fuzzy · Supabase*
