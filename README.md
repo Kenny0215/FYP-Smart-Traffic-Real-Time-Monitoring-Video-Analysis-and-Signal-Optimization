@@ -1,7 +1,7 @@
 # 🚦 SmartTraffic AI: Real-Time Traffic Monitoring And Simulation Based Adaptive Signal Optimization
 
 > **Final Year Project (FYP)**
-> AI-powered adaptive traffic signal control system with fuzzy logic, inter-lane coordination, real-time vehicle classification, and multi-lane emergency scenario management.
+> AI-powered adaptive traffic signal control system with fuzzy logic, inter-lane coordination, real-time vehicle classification and multi-lane emergency scenario management.
 
 ---
 
@@ -54,7 +54,6 @@ The system was developed as a Final Year Project and demonstrates:
 | 📈 **Analytics** | On-demand Traditional vs AI comparison charts + performance metrics table + PDF export |
 | 🚦 **AI Simulation** | Canvas intersection with type-accurate vehicles, fuzzy + coordinated signal timing, decision log |
 | 💾 **Supabase Storage** | Auto-saves lane stats every 5s including type counts, emergency log, comparison results |
-| 🛡️ **Rate Limiting** | Per-IP sliding window rate limiter on all API endpoints |
 | 🔐 **Authentication** | Supabase Auth (email/password login and registration) |
 
 ---
@@ -272,7 +271,7 @@ Frontend runs on `http://localhost:5173`
 
 ## License
 
-This project is developed for academic purposes as a Final Year Project (FYP).
-
+This project is developed for academic purposes as a University Technical Malaysia Melacca (UTeM) Final Year Project (FYP).
+Author : KENNY KHOW JIUN XIAN | Faculty Of Artificial Intelligence And Cybersecurity (FAIX)
 ---
 
