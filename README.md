@@ -8,7 +8,6 @@
 ## 📋 Table of Contents
 
 - [Overview](#overview)
-- [What's New in v4.5](#whats-new-in-v45)
 - [Features](#features)
 - [System Architecture](#system-architecture)
 - [Tech Stack](#tech-stack)
@@ -18,8 +17,7 @@
 - [Configuration](#configuration)
 - [Running the Project](#running-the-project)
 - [API Endpoints](#api-endpoints)
-- [AI Modules](#ai-modules)
-- [Pages Overview](#pages-overview)
+- [Screenshots](#screenshots)
 - [Known Limitations](#known-limitations)
 
 ---
