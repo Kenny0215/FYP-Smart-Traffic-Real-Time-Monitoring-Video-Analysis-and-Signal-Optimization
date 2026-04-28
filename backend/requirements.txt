@@ -1,0 +1,12 @@
+flask
+flask-cors
+ultralytics
+deep-sort-realtime
+opencv-python-headless
+supabase
+pandas
+numpy
+scikit-learn
+python-dotenv
+scikit-fuzzy
+cloudinary

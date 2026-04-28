@@ -1,0 +1,5 @@
+lane,avg_vehicles,avg_density,avg_speed_kmh,congestion,ideal_green_time,trad_green_time,ai_green_time,trad_wait_time,ai_wait_time,trad_utilization,ai_utilization,trad_efficiency,ai_efficiency,improvement_%,high_frames,medium_frames,low_frames
+Lane A,18.3,0.1317,48.6,Low,30,60,28,180,96,100.0,46.7,50.0,96.7,46.7,0,157,227
+Lane B,34.9,0.0628,152.8,High,49,60,54,180,18,100.0,90.0,81.7,91.7,10.0,93,22,9
+Lane C,2.6,0.0421,53.6,Low,13,60,16,180,132,100.0,26.7,21.7,95.0,73.3,0,0,165
+Lane D,30.3,0.2177,16.8,High,44,60,57,180,9,100.0,95.0,73.3,78.3,5.0,174,63,2
