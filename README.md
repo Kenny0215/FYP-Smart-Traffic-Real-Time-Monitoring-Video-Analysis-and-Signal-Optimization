@@ -384,11 +384,10 @@ The system detects 3 types of violations automatically during video analysis:
 
 | Limitation | Notes |
 |---|---|
-| Plate OCR accuracy | EasyOCR on low-resolution CCTV footage is imperfect — UNKNOWN plates are skipped entirely |
+| Plate OCR accuracy | EasyOCR on low-resolution CCTV footage is imperfect which UNKNOWN plates are skipped entirely |
 | No ANPR camera | Real JPJ system uses dedicated IR plate cameras; this uses the same frame as vehicle detection |
 | Speed calibration | `PIXELS_PER_METER = 8.0` is fixed — accuracy varies with camera angle and mounting height |
 | Single intersection | Designed for 4-lane single intersection; multi-intersection needs architectural changes |
-
 ---
 
 ## License
