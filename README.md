@@ -1,5 +1,5 @@
-# 🚦 SmartTraffic AI
-### Real-Time Traffic Monitoring & Adaptive Signal Optimization System
+# 🚦 Smart Traffic AI
+### Real-Time Traffic Monitoring & Adaptive Signal Control Decision
 
 > **Final Year Project (FYP) — Kenny Khow Jiun Xian**  
 > Faculty of Artificial Intelligence and Cybersecurity (FAIX)  
@@ -14,7 +14,6 @@
 - [System Architecture](#system-architecture)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
-- [Database Schema](#database-schema)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Configuration](#configuration)
@@ -208,76 +207,6 @@ smarttraffic/
         ├── App.tsx
         ├── types.ts
         └── utils.ts
-```
-
----
-
-## Database Schema
-
-```sql
--- User accounts (role = 'user')
-CREATE TABLE users (
-  id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  full_name  text NOT NULL,
-  email      text UNIQUE NOT NULL,
-  password   text NOT NULL,
-  created_at timestamptz DEFAULT now()
-);
-
--- Admin accounts (separate table)
-CREATE TABLE admins (
-  id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  full_name  text NOT NULL,
-  email      text UNIQUE NOT NULL,
-  password   text NOT NULL,
-  created_at timestamptz DEFAULT now()
-);
-
--- Violation complaints
-CREATE TABLE complaints (
-  id             bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  plate_number   text,
-  vehicle_type   text,
-  lane           text,
-  violation_type text DEFAULT 'Red Light Violation',
-  snapshot_url   text,
-  timestamp      timestamptz DEFAULT now(),
-  status         text DEFAULT 'pending',  -- pending | reviewed | dismissed
-  admin_notes    text
-);
-
--- User feedback
-CREATE TABLE feedback (
-  id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  user_id    text,
-  rating     integer,
-  quality    text,
-  comments   text,
-  created_at timestamptz DEFAULT now()
-);
-
--- Live lane statistics (auto-saved every 5s)
-CREATE TABLE lane_status (
-  id                    bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  lane_name             text,
-  frame                 integer,
-  vehicle_count         integer,
-  density               float,
-  heavy_ratio           float,
-  avg_speed             float,
-  congestion            text,
-  ai_green_time         float,
-  coordinated_green     integer DEFAULT 15,
-  priority_score        float DEFAULT 0.0,
-  priority_level        text,
-  signal_state          text DEFAULT 'red',
-  car_count             integer DEFAULT 0,
-  motorcycle_count      integer DEFAULT 0,
-  bus_count             integer DEFAULT 0,
-  truck_count           integer DEFAULT 0,
-  dominant_vehicle_type text DEFAULT 'None',
-  timestamp             timestamptz DEFAULT now()
-);
 ```
 
 > **Supabase Storage:** Create a public bucket named `snapshots` for violation evidence images.
