@@ -1,0 +1,6 @@
+metric,traditional,ai_adaptive,difference
+Avg Green Time (s),60,39,-21
+Avg Efficiency (%),56.7,90.4,+33.7
+Total Cycle Time (s),240,155,-85
+Avg Wait Time (s),180,64,-116
+Green Time Waste (s),104,19,-85
